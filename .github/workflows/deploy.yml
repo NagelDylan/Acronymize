@@ -46,7 +46,7 @@ jobs:
           path: frontend/dist
 
       - name: Create 404 fallback
-        run: cp frontend/dist/index.html frontend/ist/404.html
+        run: cp frontend/dist/index.html frontend/dist/404.html
 
   deploy:
     environment:
