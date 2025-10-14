@@ -2,7 +2,6 @@
   "name": "acronymize-game-ui",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://NagelDylan.github.io/Acronymize",
   "dependencies": {
     "@clerk/clerk-react": "^5.51.0",
     "@clerk/nextjs": "^6.33.3",
@@ -56,11 +55,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@vitejs/plugin-react": "^5.0.4",
     "@vitejs/plugin-react-swc": "^3.10.2",
-    "vite": "6.3.5"
+    "vite": "^6.3.5"
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview"
   }
 }
