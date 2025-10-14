@@ -1,9 +1,10 @@
 import { useAuth } from "@clerk/clerk-react";
+import { useCallback } from "react";
 
 export const useAuthHeader = () => {
   const { getToken } = useAuth();
 
-  const getAuthHeader = async () => {
+  const getAuthHeader = useCallback(async () => {
     const jwt = await getToken();
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -15,7 +16,7 @@ export const useAuthHeader = () => {
     }
     console.log(headers);
     return headers;
-  };
+  }, [getToken]);
 
   return getAuthHeader;
 };

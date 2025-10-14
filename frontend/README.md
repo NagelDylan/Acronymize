@@ -21,3 +21,5 @@ rIbvec-tohbyr-quvty5
 waht happens when there are multiple with same name with different users creating it. can they request each others?
 consider a leaderboard
 Make select your level start at the next up level, ake it so that it calls for more data when going backwards and forwards
+
+postgresql://acronymize:katgur-dUvjij-8qyrpo@localhost:5432/acronymize_db

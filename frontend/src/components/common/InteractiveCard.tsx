@@ -100,28 +100,28 @@ const Tooltip = styled.div`
 `;
 
 const HighScoreValue = styled.div<{ $score: number }>`
-  font-size: ${theme.fontSizes.xxl};
-  font-weight: ${theme.fontWeights.bold};
-  font-family: "Inter", sans-serif;
   position: absolute;
-  top: ${theme.spacing.xl};
-  right: ${theme.spacing.xl};
+  top: ${theme.spacing.lg};
+  right: ${theme.spacing.lg};
+  padding: ${theme.spacing.xs} ${theme.spacing.md};
+  color: ${theme.colors.white};
+  font-size: ${theme.fontSizes.xs};
+  border-radius: 9999px;
+  font-family: "Inter", sans-serif;
+  background-color: ${theme.colors.accentIndigo};
 
   ${(props) => {
     if (props.$score < 10) {
       return `
-        color: #E53E3E;
-        text-shadow: 0 0 12px #E53E3E60;
+        background-color: ${theme.colors.accentRed};
       `;
     } else if (props.$score < 40) {
       return `
-        color: ${theme.colors.accentYellow};
-        text-shadow: 0 0 12px ${theme.colors.accentYellow}60;
+        background-color: ${theme.colors.accentYellow};
       `;
     } else {
       return `
-        color: ${theme.colors.accentGreen};
-        text-shadow: 0 0 12px ${theme.colors.accentGreen}60;
+        background-color: ${theme.colors.accentGreen};
       `;
     }
   }}
@@ -175,20 +175,12 @@ export function InteractiveCard({
         <Title>{title}</Title>
         <Description>{description}</Description>
 
-        {badge && <Badge>{badge}</Badge>}
-
-        {showInfo && !highScore && (
-          <InfoIcon
-            $isInfoHovered={isInfoHovered}
-            onMouseEnter={handleInfoMouseEnter}
-            onMouseLeave={handleInfoMouseLeave}
-          >
-            ⓘ
-          </InfoIcon>
-        )}
+        {!highScore && badge && <Badge>{badge}</Badge>}
 
         {highScore ? (
-          <HighScoreValue $score={highScore}>{highScore}</HighScoreValue>
+          <HighScoreValue $score={highScore}>
+            High Score: {highScore}
+          </HighScoreValue>
         ) : null}
       </Card>
 

@@ -1,7 +1,6 @@
 import { Header } from "./Header";
 import styled from "styled-components";
 import { theme } from "../../theme";
-import { useUser } from "@clerk/clerk-react";
 
 interface ScreenWrapperProps {
   onDismiss: () => void;
@@ -33,8 +32,9 @@ const DotGrid = styled.div`
 const InnerContainer = styled.div`
   max-width: ${theme.screenMaxWidth};
   margin: 0 auto;
-  padding: ${theme.spacing.xl} ${theme.spacing.xxxl} ${theme.spacing.xxxl}
-    ${theme.spacing.xxxl};
+  /* prettier-ignore */
+  padding: ${theme.spacing.xl} ${theme.spacing.xxxl} ${theme.spacing
+    .xxxl} ${theme.spacing.xxxl};
   height: 100%;
 `;
 

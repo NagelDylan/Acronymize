@@ -62,7 +62,8 @@ export function useProgressSaver({
           category.slug,
           puzzle.position,
           guesses.length,
-          emojiGrid
+          emojiGrid,
+          mode
         );
         return result.success;
       } catch (error) {
@@ -85,7 +86,7 @@ export function useProgressSaver({
         // For endless mode, we save the high score (rounds completed)
         const result = await updateSpecifiedHighScore(
           category.slug,
-          roundsCompleted
+          roundsCompleted + 1
         );
         return result.success;
       } catch (error) {
@@ -104,24 +105,21 @@ export function useProgressSaver({
       if (!category) return false;
 
       try {
-        // For daily mode, we might save differently in the future
-        // For now, we'll use the same as levelup but could be extended
         const emojiGrid = generateEmojiGrid(guesses);
-
-        // TODO: Implement daily-specific progress saving
-        // This could include storing daily completion status, sharing data, etc.
-        console.log("Daily progress saved:", {
-          guesses: guesses.length,
+        const result = await updateSpecifiedLevel(
+          category.slug,
+          puzzle.position,
+          guesses.length,
           emojiGrid,
-        });
-
-        return true;
+          mode
+        );
+        return result.success;
       } catch (error) {
         console.error("Failed to save daily progress:", error);
         return false;
       }
     },
-    [category]
+    [category, updateSpecifiedLevel]
   );
 
   const saveProgress = useCallback(

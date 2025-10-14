@@ -30,17 +30,26 @@ const GameWrapper = styled.div`
   height: 100%;
 `;
 
-const ModeIndicator = styled.div`
-  margin-bottom: ${theme.spacing.xxxl};
+const ModeIndicationSection = styled.div`
+  margin-bottom: ${theme.spacing.lg};
   text-align: center;
-  color: ${theme.colors.secondaryText};
-  font-size: ${theme.fontSizes.sm};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModeIndicator = styled.span`
+  padding: ${theme.spacing.xs} ${theme.spacing.md};
+  background-color: ${theme.colors.accentIndigo};
+  color: ${theme.colors.white};
+  font-size: ${theme.fontSizes.xs};
+  border-radius: 9999px;
   font-family: "Inter", sans-serif;
 `;
 
 const ThemeText = styled.div`
   color: ${theme.colors.secondaryText};
-  font-size: ${theme.fontSizes.base};
+  font-size: ${theme.fontSizes.lg};
   font-weight: ${theme.fontWeights.normal};
   margin-bottom: ${theme.spacing.sm};
   font-family: "Inter", sans-serif;
@@ -96,19 +105,20 @@ const ScoreDisplay = styled.div`
   font-family: "Inter", sans-serif;
 `;
 
-const LoadingMessage = styled.div`
-  text-align: center;
-  color: ${theme.colors.secondaryText};
-  font-size: ${theme.fontSizes.base};
-  margin: ${theme.spacing.xl} 0;
-  font-family: "Inter", sans-serif;
-`;
-
 const ErrorMessage = styled.div`
   text-align: center;
   color: #ff6b6b;
   font-size: ${theme.fontSizes.base};
   margin: ${theme.spacing.xl} 0;
+  font-family: "Inter", sans-serif;
+`;
+
+const Title = styled.h1`
+  color: ${theme.colors.primaryText};
+  font-size: ${theme.fontSizes.xxxxl};
+  font-weight: ${theme.fontWeights.bold};
+  margin-bottom: 64px;
+  text-align: center;
   font-family: "Inter", sans-serif;
 `;
 
@@ -234,27 +244,12 @@ export function GameScreen({
     category,
   });
 
-  // Load initial puzzle for modes that need it
-  useEffect(() => {
-    if (!initialPuzzle && category) {
-      switch (mode) {
-        case "endless":
-          puzzleLoader.loadRandomPuzzle();
-          break;
-        case "daily":
-          puzzleLoader.loadDailyPuzzle();
-          break;
-        case "levelup":
-          if (level_num > 0) {
-            puzzleLoader.loadPuzzleForLevel(level_num);
-          }
-          break;
-      }
-    }
-  }, [mode, category, initialPuzzle, level_num]);
+  // Loading logic is now handled by usePuzzleLoader hook
 
   const handleExitEndGameModal = async () => {
     if (!currentPuzzle) return;
+
+    setSolution("");
 
     if (mode === "endless") {
       // Load next puzzle and continue
@@ -377,10 +372,7 @@ export function GameScreen({
         onAuthClick={() => console.log("Auth clicked")}
         isInGame={true}
       >
-        <GameWrapper>
-          <ModeIndicator>{getDisplayName(mode)}</ModeIndicator>
-          <LoadingMessage>Loading puzzle...</LoadingMessage>
-        </GameWrapper>
+        <Title>Loading level...</Title>
       </ScreenWrapper>
     );
   }
@@ -429,9 +421,11 @@ export function GameScreen({
         onExitClick={() => setCurrentScreen("landing")}
       />
       <GameWrapper onClick={handleContainerClick}>
-        <ModeIndicator>
-          {getDisplayName(mode)} • {category ? category.title : "No Category"}
-        </ModeIndicator>
+        <ModeIndicationSection>
+          <ModeIndicator>
+            {getDisplayName(mode)} • {category ? category.title : "No Category"}
+          </ModeIndicator>
+        </ModeIndicationSection>
 
         {mode == "endless" && (
           <ScoreDisplay>Round {roundsCompleted + 1}</ScoreDisplay>

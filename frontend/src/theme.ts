@@ -16,6 +16,7 @@ export const theme = {
     buttonHover: "#555555",
     accentGreen: "#2E7D32",
     accentYellow: "#B59458",
+    accentRed: "#E53E3E",
     gradientRed: "#E57373",
     gradientYellow: "#FFF176",
     gradientGreen: "#81C784",

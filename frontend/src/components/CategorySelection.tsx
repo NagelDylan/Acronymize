@@ -1,7 +1,7 @@
 import { ScreenWrapper } from "./common/ScreenWrapper";
 import { SelectionScreen } from "./common/SelectionScreen";
 import type { InteractiveCardProps, CategoryType } from "../types/components";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useCategoryService } from "../services/categoryService";
 import { modeDisplayNames } from "../constants";
@@ -20,7 +20,7 @@ export function CategorySelection({
   selectedMode,
 }: CategorySelectionProps) {
   const [categories, setCategories] = useState<InteractiveCardProps[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, isLoaded } = useUser();
 
@@ -51,14 +51,14 @@ export function CategorySelection({
       }
 
       console.log("🚀 Starting loadCategories...");
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       try {
         // The hook automatically handles authentication if user is signed in
         const clerkUserId = user?.id;
         console.log("🔍 Calling getCategories with userId:", clerkUserId);
-        const result = await getCategories(clerkUserId);
+        const result = await getCategories(selectedMode, clerkUserId);
 
         console.log("📡 API Response:", result);
 
@@ -82,12 +82,12 @@ export function CategorySelection({
         setError(errorMessage);
         console.error("Error fetching categories:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     loadCategories();
-  }, [isLoaded, user]); // Removed getCategories to prevent infinite loop
+  }, [isLoaded, user?.id, selectedMode]);
 
   const handleCategoryClick = (category: InteractiveCardProps) => {
     // Convert InteractiveCardProps to CategoryType
@@ -136,7 +136,11 @@ export function CategorySelection({
   return (
     <ScreenWrapper onDismiss={onDismiss} onAuthClick={onAuthClick}>
       <SelectionScreen
-        title={modeDisplayNames[selectedMode] || selectedMode}
+        title={
+          !isLoading
+            ? modeDisplayNames[selectedMode] || selectedMode
+            : "Loading categories..."
+        }
         cards={categoriesWithHandlers}
       />
     </ScreenWrapper>

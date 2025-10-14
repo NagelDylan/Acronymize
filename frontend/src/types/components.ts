@@ -32,6 +32,12 @@ export interface Category {
   created_at: string;
 }
 
+// Category with optional dynamic fields added by backend based on game mode
+export interface CategoryWithDynamicFields extends Category {
+  high_score?: number;  // Added for endless mode
+  badge?: string;       // Added for daily mode (e.g., "Completed")
+}
+
 export interface FrontendPuzzleElement {
   acronym: string;
   clue: string;

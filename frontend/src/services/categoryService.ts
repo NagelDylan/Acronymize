@@ -1,17 +1,24 @@
-import type { InteractiveCardProps, Category } from "../types/components";
+import { useCallback } from "react";
+import type {
+  InteractiveCardProps,
+  CategoryWithDynamicFields,
+} from "../types/components";
 import { useApi, type ApiResponse } from "../utils/api";
 
 /**
  * Maps a backend category object to frontend InteractiveCardProps
  */
 function mapCategoryToInteractiveCard(
-  category: Category
+  category: CategoryWithDynamicFields
 ): InteractiveCardProps {
   return {
     icon: category.emoji,
     title: category.name,
     description: category.description,
     slug: category.slug,
+    // Map dynamic fields added by backend
+    highScore: category.high_score,
+    badge: category.badge,
   };
 }
 
@@ -22,23 +29,32 @@ function mapCategoryToInteractiveCard(
 export function useCategoryService() {
   const api = useApi();
 
-  const getCategories = async (userId?: string): Promise<ApiResponse<InteractiveCardProps[]>> => {
-    const params = userId ? { user_id: userId } : undefined;
+  const getCategories = useCallback(
+    async (
+      mode: string,
+      userId?: string
+    ): Promise<ApiResponse<InteractiveCardProps[]>> => {
+      const params = { user_id: userId, game_mode: mode };
 
-    const result = await api.get<Category[]>('/categories/', { params });
+      const result = await api.get<CategoryWithDynamicFields[]>(
+        "/categories/",
+        { params }
+      );
 
-    if (result.success && result.data) {
+      if (result.success && result.data) {
+        return {
+          success: true,
+          data: result.data.map(mapCategoryToInteractiveCard),
+        };
+      }
+
       return {
-        success: true,
-        data: result.data.map(mapCategoryToInteractiveCard),
+        success: false,
+        error: result.error || "Failed to fetch categories",
       };
-    }
-
-    return {
-      success: false,
-      error: result.error || "Failed to fetch categories",
-    };
-  };
+    },
+    [api]
+  );
 
   return { getCategories };
 }

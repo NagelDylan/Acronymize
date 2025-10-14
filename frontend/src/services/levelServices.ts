@@ -19,7 +19,32 @@ export function useLevelService() {
     });
   };
 
-  return { getSpecifiedLevels };
+  const getCenteredLevels = async (
+    slug: string,
+    centerPosition?: number
+  ): Promise<ApiResponse<LevelsResponse>> => {
+    const params: { slug: string; center_position?: string } = { slug };
+
+    if (centerPosition !== undefined) {
+      params.center_position = centerPosition.toString();
+    }
+
+    return await api.get<LevelsResponse>("/levelup/levels/", { params });
+  };
+
+  const getPreviousLevels = async (
+    slug: string,
+    beforePosition: number
+  ): Promise<ApiResponse<LevelsResponse>> => {
+    return await api.get<LevelsResponse>("/levelup/levels/", {
+      params: {
+        slug: slug,
+        before_position: beforePosition.toString(),
+      },
+    });
+  };
+
+  return { getSpecifiedLevels, getCenteredLevels, getPreviousLevels };
 }
 
 export function updateLevelService() {
@@ -29,12 +54,13 @@ export function updateLevelService() {
     slug: string,
     levelNum: number,
     score: number,
-    attempts_data: string
+    attempts_data: string,
+    game_mode: string
   ): Promise<ApiResponse<LevelsResponse>> => {
     return await api.post<LevelsResponse>(
       "/levelup/levels/",
       { attempts_data: attempts_data }, // data object
-      { params: { slug, level_num: levelNum, score } } // config object with params
+      { params: { slug, level_num: levelNum, score, game_mode } } // config object with params
     );
   };
 

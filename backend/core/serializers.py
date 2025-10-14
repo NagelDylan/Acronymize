@@ -4,7 +4,7 @@ from .models import Category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['name', 'slug', 'description', 'emoji']
+        fields = ['id', 'name', 'slug', 'description', 'emoji']
 
 class LevelupLevelSerializer(serializers.Serializer):
         puzzle_id = serializers.IntegerField()

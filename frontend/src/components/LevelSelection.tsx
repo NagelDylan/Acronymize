@@ -234,8 +234,12 @@ export function LevelSelection({
   const [isLoading, setIsLoading] = useState(true);
   const { user, isLoaded } = useUser();
   const [afterPosition, setAfterPosition] = useState(0);
+  const [beforePosition, setBeforePosition] = useState(-1);
   const [levels, setLevels] = useState<LevelItem[]>([]);
-  const { getSpecifiedLevels } = useLevelService();
+  const [hasMore, setHasMore] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const { getSpecifiedLevels, getCenteredLevels, getPreviousLevels } =
+    useLevelService();
 
   const calculateLevelStatus = (
     par_score: number,
@@ -314,52 +318,69 @@ export function LevelSelection({
     );
 
     const loadLevels = async () => {
-      if (!category || afterPosition == NO_MORE_LEVELS) return;
+      if (!category) return;
       if (!isLoaded) {
         console.log("⏳ Waiting for Clerk to load...");
         return;
       }
 
-      console.log("🚀 Starting loadLevels...");
+      console.log("🚀 Starting centered loadLevels...");
 
       try {
-        // The hook automatically handles authentication if user is signed in
+        // Use centered loading for initial load
         const clerkUserId = user?.id;
-        console.log("🔍 Calling getSpecifiedLevels with userId:", clerkUserId);
+        console.log("🔍 Calling getCenteredLevels with userId:", clerkUserId);
         const slug = category?.slug ? category.slug : "";
-        const result = await getSpecifiedLevels(slug, afterPosition);
+        const result = await getCenteredLevels(slug);
 
         console.log("📡 API Response:", result);
 
         if (result.success && result.data) {
           // Process the raw level items to add status field
-          // For initial load, no existing levels; for pagination, pass current levels
-          const existingLevels = afterPosition === 0 ? [] : levels;
-          const processedLevels = processLevelsWithStatus(
-            result.data.items,
-            existingLevels
-          );
+          const processedLevels = processLevelsWithStatus(result.data.items);
+          setLevels(processedLevels);
 
-          // For initial load, replace levels; for pagination, append
-          const updatedLevels =
-            afterPosition === 0
-              ? processedLevels
-              : [...levels, ...processedLevels];
-          setLevels(updatedLevels);
+          // Set pagination state
+          setHasMore(result.data.has_more);
+          setHasPrev(result.data.has_prev);
 
-          // Update cursor for potential next load
-          if (result.data.next_cursor !== NO_MORE_LEVELS) {
+          if (result.data.next_cursor !== -1) {
             setAfterPosition(result.data.next_cursor);
           } else {
             setAfterPosition(NO_MORE_LEVELS);
           }
+
+          if (result.data.prev_cursor !== -1) {
+            setBeforePosition(result.data.prev_cursor + 1); // Convert to first position to load
+          } else {
+            setBeforePosition(-1);
+          }
+
+          // Find the first unlocked level and set it as the current index
+          const firstUnlockedIndex = processedLevels.findIndex(
+            (level) => level.status !== "locked"
+          );
+
+          // If center_position was returned, try to start at that level, otherwise use first unlocked
+          let targetIndex = firstUnlockedIndex !== -1 ? firstUnlockedIndex : 0;
+
+          if (result?.data?.center_position) {
+            const centerIndex = processedLevels.findIndex(
+              (level) => level.position === result.data.center_position
+            );
+            if (centerIndex !== -1) {
+              targetIndex = centerIndex;
+            }
+          }
+
+          setCurrentIndex(targetIndex);
         } else {
           // Handle API error with standardized error message
           console.error("❌ API Error:", result.error);
         }
       } catch (error) {
         // Handle unexpected errors
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching levels:", error);
       } finally {
         setIsLoading(false);
       }
@@ -369,7 +390,7 @@ export function LevelSelection({
   }, [isLoaded, user]); // Removed getCategories to prevent infinite loop
 
   const loadMoreLevels = async () => {
-    if (!category || afterPosition === NO_MORE_LEVELS || isLoading) return;
+    if (!category || !hasMore || isLoading) return;
 
     setIsLoading(true);
 
@@ -386,7 +407,9 @@ export function LevelSelection({
         const updatedLevels = [...levels, ...processedLevels];
         setLevels(updatedLevels);
 
-        if (result.data.next_cursor !== NO_MORE_LEVELS) {
+        // Update pagination state
+        setHasMore(result.data.has_more);
+        if (result.data.next_cursor !== -1) {
           setAfterPosition(result.data.next_cursor);
         } else {
           setAfterPosition(NO_MORE_LEVELS);
@@ -399,9 +422,49 @@ export function LevelSelection({
     }
   };
 
+  const loadPreviousLevels = async () => {
+    if (!category || !hasPrev || beforePosition === -1 || isLoading) return;
+
+    setIsLoading(true);
+
+    try {
+      const slug = category.slug;
+      const result = await getPreviousLevels(slug, beforePosition);
+
+      if (result.success && result.data) {
+        // Process new levels and prepend to existing levels
+        const processedLevels = processLevelsWithStatus(result.data.items);
+        const updatedLevels = [...processedLevels, ...levels];
+
+        // Adjust current index to account for prepended levels
+        const newCurrentIndex = currentIndex + processedLevels.length;
+
+        setLevels(updatedLevels);
+        setCurrentIndex(newCurrentIndex);
+
+        // Update pagination state
+        setHasPrev(result.data.has_prev);
+        if (result.data.prev_cursor !== -1) {
+          setBeforePosition(result.data.prev_cursor + 1);
+        } else {
+          setBeforePosition(-1);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading previous levels:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+
+      // Load previous levels if we're near the beginning and can load more
+      if (currentIndex <= 3 && hasPrev && !isLoading) {
+        loadPreviousLevels();
+      }
     }
   };
 
@@ -410,11 +473,7 @@ export function LevelSelection({
       setCurrentIndex(currentIndex + 1);
 
       // Load more levels if we're 3 levels from the end and can load more
-      if (
-        currentIndex >= levels.length - 4 &&
-        afterPosition !== NO_MORE_LEVELS &&
-        !isLoading
-      ) {
+      if (currentIndex >= levels.length - 4 && hasMore && !isLoading) {
         loadMoreLevels();
       }
     }
@@ -467,11 +526,9 @@ export function LevelSelection({
 
             <LevelCard $position="current">
               <LevelNumber>{currentLevel.position}</LevelNumber>
-              {currentStatus !== "ready" ? (
-                <StatusBadge $status={currentStatus}>
-                  {statusLabels[currentStatus]}
-                </StatusBadge>
-              ) : null}
+              <StatusBadge $status={currentStatus}>
+                {statusLabels[currentStatus]}
+              </StatusBadge>
             </LevelCard>
 
             {nextLevel && (

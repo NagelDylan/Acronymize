@@ -48,7 +48,11 @@ export interface LevelItem {
 export interface LevelsResponse {
   items: LevelItem[];
   next_cursor: number;
+  prev_cursor: number;
+  has_more: boolean;
+  has_prev: boolean;
   batch_size: number;
+  center_position?: number;
 }
 
 export interface EndlessItem {

@@ -173,6 +173,7 @@ export function EndGameModal({
     if (mode === "levelup") {
       setCurrentScreen("select-level");
     } else if (mode === "endless") {
+      setDisplayAnswer("...");
       if (!onClose) return;
       // If the player is alive, continue to the next round, otherwise go to landing.
       isStillAlive ? onClose() : setCurrentScreen("landing");
@@ -220,7 +221,9 @@ export function EndGameModal({
       <ModalContent>
         <Title>{result}</Title>
 
-        <Description>The answer was: {displayAnswer}</Description>
+        <Description>
+          The answer was: {displayAnswer == "" ? "..." : displayAnswer}
+        </Description>
 
         {/* <EmojiGrid>{emojiGrid}</EmojiGrid> */}
 
@@ -241,7 +244,7 @@ export function EndGameModal({
         >
           {primaryText()}
         </PrimaryButton>
-        {mode != "endless" ? (
+        {isStillAlive ? (
           <SecondaryButton
             onClick={secondaryClick}
             onMouseEnter={() => setSecondaryHovered(true)}

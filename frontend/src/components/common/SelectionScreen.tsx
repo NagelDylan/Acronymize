@@ -49,6 +49,7 @@ export const SelectionScreen = ({ title, cards }: SelectionTitleProps) => {
             showInfo={cardProps.showInfo || false}
             tooltipContent={cardProps.tooltipContent || undefined}
             onInfoHover={cardProps.onInfoHover || undefined}
+            highScore={cardProps.highScore || undefined}
           />
         ))}
       </CardGrid>

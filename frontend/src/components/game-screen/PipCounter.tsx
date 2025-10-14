@@ -29,7 +29,7 @@ const Pip = styled.div<{
     const colors = {
       green: theme.colors.accentGreen,
       yellow: theme.colors.accentYellow,
-      red: "#E53E3E",
+      red: theme.colors.accentRed,
     };
 
     const color = colors[props.$color];

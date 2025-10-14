@@ -1,4 +1,5 @@
 import { useAuthHeader } from './auth';
+import { useCallback, useMemo } from 'react';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -21,7 +22,7 @@ export const useApi = () => {
   const getAuthHeader = useAuthHeader();
 
   // Helper to build URL with query params
-  const buildUrl = (endpoint: string, params?: Record<string, any>): string => {
+  const buildUrl = useCallback((endpoint: string, params?: Record<string, any>): string => {
     const url = new URL(`${API_BASE_URL}${endpoint}`);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -31,10 +32,10 @@ export const useApi = () => {
       });
     }
     return url.toString();
-  };
+  }, []);
 
   // Generic request handler
-  const makeRequest = async <T>(
+  const makeRequest = useCallback(async <T>(
     method: string,
     endpoint: string,
     data?: any,
@@ -87,32 +88,32 @@ export const useApi = () => {
         error: error instanceof Error ? error.message : 'Network error occurred',
       };
     }
-  };
+  }, [getAuthHeader, buildUrl]);
 
   // HTTP method helpers
-  const get = <T>(endpoint: string, config?: RequestConfig) =>
-    makeRequest<T>('GET', endpoint, undefined, config);
+  const get = useCallback(<T>(endpoint: string, config?: RequestConfig) =>
+    makeRequest<T>('GET', endpoint, undefined, config), [makeRequest]);
 
-  const post = <T>(endpoint: string, data?: any, config?: RequestConfig) =>
-    makeRequest<T>('POST', endpoint, data, config);
+  const post = useCallback(<T>(endpoint: string, data?: any, config?: RequestConfig) =>
+    makeRequest<T>('POST', endpoint, data, config), [makeRequest]);
 
-  const put = <T>(endpoint: string, data?: any, config?: RequestConfig) =>
-    makeRequest<T>('PUT', endpoint, data, config);
+  const put = useCallback(<T>(endpoint: string, data?: any, config?: RequestConfig) =>
+    makeRequest<T>('PUT', endpoint, data, config), [makeRequest]);
 
-  const patch = <T>(endpoint: string, data?: any, config?: RequestConfig) =>
-    makeRequest<T>('PATCH', endpoint, data, config);
+  const patch = useCallback(<T>(endpoint: string, data?: any, config?: RequestConfig) =>
+    makeRequest<T>('PATCH', endpoint, data, config), [makeRequest]);
 
-  const del = <T>(endpoint: string, config?: RequestConfig) =>
-    makeRequest<T>('DELETE', endpoint, undefined, config);
+  const del = useCallback(<T>(endpoint: string, config?: RequestConfig) =>
+    makeRequest<T>('DELETE', endpoint, undefined, config), [makeRequest]);
 
-  return {
+  return useMemo(() => ({
     get,
     post,
     put,
     patch,
     delete: del,
     makeRequest,
-  };
+  }), [get, post, put, patch, del, makeRequest]);
 };
 
 // Non-hook version for use outside of React components

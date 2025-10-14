@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type FrontendPuzzleElement } from "../types/components";
 import { type CategoryType } from "../types/components";
 import { usePuzzleService } from "../services/puzzleService";
@@ -25,13 +25,22 @@ interface UsePuzzleLoaderReturn {
 export function usePuzzleLoader({
   mode,
   category,
+  initialPuzzle,
   levelNum = 0,
   setCurrentPuzzle,
 }: UsePuzzleLoaderProps): UsePuzzleLoaderReturn {
   const { getPuzzle } = usePuzzleService();
   const { getLevelPacket } = levelPacketService();
 
-  const [isLoading, setIsLoading] = useState(false);
+  // Determine if we need to load a puzzle initially
+  const needsLoading =
+    !initialPuzzle &&
+    category &&
+    (mode === "endless" ||
+      mode === "daily" ||
+      (mode === "levelup" && levelNum > 0));
+
+  const [isLoading, setIsLoading] = useState(needsLoading);
   const [error, setError] = useState<string | null>(null);
   const [currentLevel, setCurrentLevel] = useState(levelNum);
 
@@ -176,6 +185,25 @@ export function usePuzzleLoader({
     loadRandomPuzzle,
     loadDailyPuzzle,
   ]);
+
+  // Load initial puzzle when hook initializes
+  useEffect(() => {
+    if (needsLoading && category) {
+      switch (mode) {
+        case "endless":
+          loadRandomPuzzle();
+          break;
+        case "daily":
+          loadDailyPuzzle();
+          break;
+        case "levelup":
+          if (levelNum > 0) {
+            loadPuzzleForLevel(levelNum);
+          }
+          break;
+      }
+    }
+  }, []); // Empty dependency array - only run on mount
 
   return {
     isLoading,
