@@ -45,7 +45,7 @@ export function ModeSelection({
       title: "Level Up",
       description: "Progress through curated challenges.",
       slug: "levelup",
-      onClick: () => handleModeClick("levelup", false),
+      onClick: () => handleModeClick("levelup", true),
     },
     {
       icon: "🎉",

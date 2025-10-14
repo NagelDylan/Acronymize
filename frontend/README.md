@@ -4,8 +4,8 @@ postgres-# CREATE DATABASE acronymize_db OWNER acronymize;
 Set up backend:
 source .venv/bin/activate
 cd backend
-python manage.py runserver
-ngrok http 8000
+python manage.py runserver 0.0.0.0:8001
+ngrok http 8001
 
 Database view:
 psql -U acronymize -d acronymize*db;
