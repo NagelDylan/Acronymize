@@ -22,7 +22,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Vite env vars (compile-time)
       VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +43,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: frontend/build
 
   deploy:
     environment:
