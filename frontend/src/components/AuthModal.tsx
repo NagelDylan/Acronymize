@@ -26,7 +26,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <BlankModal isOpen={isOpen} onClose={() => onClose()}>
-      <SignIn routing="virtual" />
+      <SignIn path="/Acronymize" routing="path" />
     </BlankModal>
   );
 }
