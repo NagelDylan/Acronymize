@@ -1,8 +1,8 @@
-import { useAuthHeader } from './auth';
-import { useCallback, useMemo } from 'react';
+import { useAuthHeader } from "./auth";
+import { useCallback, useMemo } from "react";
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = "https://cathi-unobligative-irwin.ngrok-free.dev/api";
 
 // Response types
 export interface ApiResponse<T = any> {
@@ -22,98 +22,126 @@ export const useApi = () => {
   const getAuthHeader = useAuthHeader();
 
   // Helper to build URL with query params
-  const buildUrl = useCallback((endpoint: string, params?: Record<string, any>): string => {
-    const url = new URL(`${API_BASE_URL}${endpoint}`);
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
-        }
-      });
-    }
-    return url.toString();
-  }, []);
+  const buildUrl = useCallback(
+    (endpoint: string, params?: Record<string, any>): string => {
+      const url = new URL(`${API_BASE_URL}${endpoint}`);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+      return url.toString();
+    },
+    []
+  );
 
   // Generic request handler
-  const makeRequest = useCallback(async <T>(
-    method: string,
-    endpoint: string,
-    data?: any,
-    config?: RequestConfig
-  ): Promise<ApiResponse<T>> => {
-    try {
-      const authHeaders = await getAuthHeader();
-      const headers = {
-        ...authHeaders,
-        ...config?.headers,
-      };
+  const makeRequest = useCallback(
+    async <T>(
+      method: string,
+      endpoint: string,
+      data?: any,
+      config?: RequestConfig
+    ): Promise<ApiResponse<T>> => {
+      try {
+        const authHeaders = await getAuthHeader();
+        const headers = {
+          ...authHeaders,
+          ...config?.headers,
+        };
 
-      const url = buildUrl(endpoint, config?.params);
+        const url = buildUrl(endpoint, config?.params);
 
-      const requestConfig: RequestInit = {
-        method,
-        headers,
-      };
+        const requestConfig: RequestInit = {
+          method,
+          headers,
+        };
 
-      // Add body for POST, PUT, PATCH requests
-      if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
-        requestConfig.body = JSON.stringify(data);
-      }
+        // Add body for POST, PUT, PATCH requests
+        if (data && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
+          requestConfig.body = JSON.stringify(data);
+        }
 
-      const response = await fetch(url, requestConfig);
+        const response = await fetch(url, requestConfig);
 
-      // Handle non-JSON responses
-      let responseData;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        responseData = await response.json();
-      } else {
-        responseData = await response.text();
-      }
+        // Handle non-JSON responses
+        let responseData;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          responseData = await response.json();
+        } else {
+          responseData = await response.text();
+        }
 
-      if (!response.ok) {
+        if (!response.ok) {
+          return {
+            success: false,
+            error:
+              responseData?.message ||
+              responseData ||
+              `HTTP ${response.status}: ${response.statusText}`,
+          };
+        }
+
+        return {
+          success: true,
+          data: responseData,
+        };
+      } catch (error) {
         return {
           success: false,
-          error: responseData?.message || responseData || `HTTP ${response.status}: ${response.statusText}`,
+          error:
+            error instanceof Error ? error.message : "Network error occurred",
         };
       }
-
-      return {
-        success: true,
-        data: responseData,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Network error occurred',
-      };
-    }
-  }, [getAuthHeader, buildUrl]);
+    },
+    [getAuthHeader, buildUrl]
+  );
 
   // HTTP method helpers
-  const get = useCallback(<T>(endpoint: string, config?: RequestConfig) =>
-    makeRequest<T>('GET', endpoint, undefined, config), [makeRequest]);
+  const get = useCallback(
+    <T>(endpoint: string, config?: RequestConfig) =>
+      makeRequest<T>("GET", endpoint, undefined, config),
+    [makeRequest]
+  );
 
-  const post = useCallback(<T>(endpoint: string, data?: any, config?: RequestConfig) =>
-    makeRequest<T>('POST', endpoint, data, config), [makeRequest]);
+  const post = useCallback(
+    <T>(endpoint: string, data?: any, config?: RequestConfig) =>
+      makeRequest<T>("POST", endpoint, data, config),
+    [makeRequest]
+  );
 
-  const put = useCallback(<T>(endpoint: string, data?: any, config?: RequestConfig) =>
-    makeRequest<T>('PUT', endpoint, data, config), [makeRequest]);
+  const put = useCallback(
+    <T>(endpoint: string, data?: any, config?: RequestConfig) =>
+      makeRequest<T>("PUT", endpoint, data, config),
+    [makeRequest]
+  );
 
-  const patch = useCallback(<T>(endpoint: string, data?: any, config?: RequestConfig) =>
-    makeRequest<T>('PATCH', endpoint, data, config), [makeRequest]);
+  const patch = useCallback(
+    <T>(endpoint: string, data?: any, config?: RequestConfig) =>
+      makeRequest<T>("PATCH", endpoint, data, config),
+    [makeRequest]
+  );
 
-  const del = useCallback(<T>(endpoint: string, config?: RequestConfig) =>
-    makeRequest<T>('DELETE', endpoint, undefined, config), [makeRequest]);
+  const del = useCallback(
+    <T>(endpoint: string, config?: RequestConfig) =>
+      makeRequest<T>("DELETE", endpoint, undefined, config),
+    [makeRequest]
+  );
 
-  return useMemo(() => ({
-    get,
-    post,
-    put,
-    patch,
-    delete: del,
-    makeRequest,
-  }), [get, post, put, patch, del, makeRequest]);
+  return useMemo(
+    () => ({
+      get,
+      post,
+      put,
+      patch,
+      delete: del,
+      makeRequest,
+    }),
+    [get, post, put, patch, del, makeRequest]
+  );
 };
 
 // Non-hook version for use outside of React components
@@ -144,8 +172,8 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     try {
       const headers = {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'True',
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "True",
         ...config?.headers,
       };
 
@@ -156,15 +184,15 @@ export class ApiClient {
         headers,
       };
 
-      if (data && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+      if (data && ["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
         requestConfig.body = JSON.stringify(data);
       }
 
       const response = await fetch(url, requestConfig);
 
       let responseData;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
         responseData = await response.json();
       } else {
         responseData = await response.text();
@@ -173,7 +201,10 @@ export class ApiClient {
       if (!response.ok) {
         return {
           success: false,
-          error: responseData?.message || responseData || `HTTP ${response.status}: ${response.statusText}`,
+          error:
+            responseData?.message ||
+            responseData ||
+            `HTTP ${response.status}: ${response.statusText}`,
         };
       }
 
@@ -184,29 +215,30 @@ export class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Network error occurred',
+        error:
+          error instanceof Error ? error.message : "Network error occurred",
       };
     }
   }
 
   get<T>(endpoint: string, config?: RequestConfig) {
-    return this.makeRequest<T>('GET', endpoint, undefined, config);
+    return this.makeRequest<T>("GET", endpoint, undefined, config);
   }
 
   post<T>(endpoint: string, data?: any, config?: RequestConfig) {
-    return this.makeRequest<T>('POST', endpoint, data, config);
+    return this.makeRequest<T>("POST", endpoint, data, config);
   }
 
   put<T>(endpoint: string, data?: any, config?: RequestConfig) {
-    return this.makeRequest<T>('PUT', endpoint, data, config);
+    return this.makeRequest<T>("PUT", endpoint, data, config);
   }
 
   patch<T>(endpoint: string, data?: any, config?: RequestConfig) {
-    return this.makeRequest<T>('PATCH', endpoint, data, config);
+    return this.makeRequest<T>("PATCH", endpoint, data, config);
   }
 
   delete<T>(endpoint: string, config?: RequestConfig) {
-    return this.makeRequest<T>('DELETE', endpoint, undefined, config);
+    return this.makeRequest<T>("DELETE", endpoint, undefined, config);
   }
 }
 

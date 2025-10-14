@@ -1,13 +1,12 @@
-
 # .github/workflows/deploy.yml
-name: Deploy Frontend to GitHub Pages
+name: Deploy Frontend (Vite) to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - 'frontend/**'
-      - '.github/workflows/deploy.yml'
+      - "frontend/**"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 permissions:
@@ -22,6 +21,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Vite env vars (compile-time)
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,16 +35,17 @@ jobs:
 
       - name: Install deps
         working-directory: frontend
-        run: npm ci   # requires frontend/package-lock.json committed
+        run: npm ci
 
-      - name: Build
+      - name: Build (Vite -> dist)
         working-directory: frontend
         run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/build
+          path: frontend/dist
+
   deploy:
     environment:
       name: github-pages
