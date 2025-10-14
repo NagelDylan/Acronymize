@@ -1,0 +1,16 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Acronym Game Icon</title>
+  <desc id="desc">Minimal dark rounded square with a simple indigo A.</desc>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1024" height="1024" rx="120" fill="#111111" stroke="#2A2A2A" stroke-width="2"/>
+
+  <!-- Monoline A -->
+  <g transform="translate(0,0)">
+    <!-- Legs -->
+    <path d="M360 720 L512 304" stroke="#4F46E5" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M664 720 L512 304" stroke="#4F46E5" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Crossbar -->
+    <path d="M424 560 L600 560" stroke="#4F46E5" stroke-width="64" stroke-linecap="round"/>
+  </g>
+</svg>

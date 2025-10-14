@@ -111,9 +111,7 @@ export function RightSide() {
     <RightColumn>
       <GamePreview>
         <ModeIndicationSection>
-          <ModeIndicator>
-            Acronymize • Where genius meets nonsense
-          </ModeIndicator>
+          <ModeIndicator>Acronymize</ModeIndicator>
         </ModeIndicationSection>
         <ThemeText>How players describe this game</ThemeText>
         <Acronym>GOAT</Acronym>

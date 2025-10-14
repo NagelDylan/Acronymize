@@ -45,6 +45,9 @@ jobs:
         with:
           path: frontend/dist
 
+      - name: Create 404 fallback
+        run: cp dist/index.html dist/404.html
+
   deploy:
     environment:
       name: github-pages
