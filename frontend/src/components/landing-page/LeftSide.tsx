@@ -60,7 +60,7 @@ const PrimaryButton = styled.button`
 
 const SecondaryButton = styled.button`
   padding: ${theme.spacing.lg} ${theme.spacing.xxxl};
-  background-color: transparent;
+  background-color: ${theme.colors.background};
   color: ${theme.colors.accentIndigo};
   border: 1px solid ${theme.colors.accentIndigo};
   border-radius: ${theme.borderRadius.md};
