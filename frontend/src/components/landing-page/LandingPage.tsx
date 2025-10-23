@@ -22,7 +22,7 @@ const Container = styled.div`
 const DotGrid = styled.div`
   position: absolute;
   inset: 0;
-  opacity: 0.03;
+  opacity: 0.1;
   background-image: radial-gradient(
     circle,
     ${theme.colors.dotGrid} 1px,
