@@ -378,22 +378,22 @@ Optimized build output in `./dist/`:
 - **Asset Optimization**: Images and fonts optimized
 - **Gzip Compression**: Enabled for smaller bundle sizes
 
-### GitHub Pages Deployment
+### Production Deployment
 
-The app is configured for GitHub Pages with base path `/Acronymize/`:
+The app is deployed to the custom domain **acronymize.fun**:
 
 ```typescript
 // vite.config.ts
 export default defineConfig({
-  base: "/Acronymize/",
+  base: "/",  // Root path for custom domain
   // ... other config
 });
 ```
 
-**Deploy to GitHub Pages:**
+**Deploy to Production:**
 1. Build the project: `npm run build`
-2. Deploy `dist/` folder to `gh-pages` branch
-3. Configure repository settings for GitHub Pages
+2. Deploy `dist/` folder to your hosting provider
+3. Configure DNS settings to point to your hosting provider
 
 ### Environment-Specific Builds
 

@@ -26,11 +26,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <BlankModal isOpen={isOpen} onClose={() => onClose()}>
-      <SignIn
-        forceRedirectUrl={
-          window.location.hostname !== "localhost" ? "/Acronymize" : undefined
-        }
-      />
+      <SignIn />
     </BlankModal>
   );
 }
