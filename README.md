@@ -2,7 +2,7 @@
 
 **Acronymize** is a modern web-based word puzzle game that challenges players to guess words that form acronyms based on given themes and clues. Think Wordle meets acronym puzzles with multiple engaging game modes and real-time feedback.
 
-![Game Preview](https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=Acronymize+Game+Preview)
+[Play Here](http://www.acronymize.fun/)
 
 ## 🎮 Game Features
 
