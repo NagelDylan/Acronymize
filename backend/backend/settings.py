@@ -167,7 +167,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite development server
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
-    "https://acronymize.fun"
+    "https://acronymize.nagelbros.com"
 ]
 
 # For development - allow all origins (less secure, but easier for development)

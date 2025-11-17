@@ -192,7 +192,7 @@ Both frontend and backend require environment variables for proper configuration
 
 ### Frontend Deployment
 
-The frontend is deployed to the custom domain **acronymize.fun**. See `frontend/README.md` for deployment instructions.
+The frontend is deployed to the custom domain **acronymize.nagelbros.com**. See `frontend/README.md` for deployment instructions.
 
 ### Backend Deployment
 

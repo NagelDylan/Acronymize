@@ -380,7 +380,7 @@ Optimized build output in `./dist/`:
 
 ### Production Deployment
 
-The app is deployed to the custom domain **acronymize.fun**:
+The app is deployed to the custom domain **acronymize.nagelbros.com**:
 
 ```typescript
 // vite.config.ts
