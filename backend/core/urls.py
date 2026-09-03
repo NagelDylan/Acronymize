@@ -1,8 +1,9 @@
 # core/urls.py
 from django.urls import path
-from .views import CategoryListView, CategoryPuzzleCountView, PuzzleRequest, PuzzleGuessResponse, PuzzleSolution, ClerkWebhookView, LevelupLevelsView, EndlessMyScoreView, EndlessSubmitView, EndlessLevelPacket, WordOfTheDay
+from .views import CategoryListView, CategoryPuzzleCountView, PuzzleRequest, PuzzleGuessResponse, PuzzleSolution, ClerkWebhookView, LevelupLevelsView, EndlessMyScoreView, EndlessSubmitView, EndlessLevelPacket, WordOfTheDay, HealthCheckView
 
 urlpatterns = [
+    path('health/', HealthCheckView.as_view(), name='health-check'),
     path('categories/', CategoryListView.as_view(), name='category-list'),
     path('categories/<slug:slug>/puzzles/count/', CategoryPuzzleCountView.as_view(), name='category-puzzle-count'),
     path('puzzles/<slug:slug>/<int:level_num>/', PuzzleRequest.as_view(), name='category-puzzle-retrieve'),

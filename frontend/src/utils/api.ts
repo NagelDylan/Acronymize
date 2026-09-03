@@ -2,7 +2,47 @@ import { useAuthHeader } from "./auth";
 import { useCallback, useMemo } from "react";
 
 // API Configuration
-const API_BASE_URL = "https://cathi-unobligative-irwin.ngrok-free.dev/api";
+export const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://cathi-unobligative-irwin.ngrok-free.dev/api"
+).replace(/\/$/, "");
+
+const SERVER_CHECK_TIMEOUT_MS = 5000;
+
+/**
+ * Checks that the API is reachable before the user starts playing.
+ * The response body is validated so an ngrok error/interstitial page does not
+ * get mistaken for a healthy game server.
+ */
+export async function checkServerHealth(): Promise<boolean> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(
+    () => controller.abort(),
+    SERVER_CHECK_TIMEOUT_MS
+  );
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/health/`, {
+      headers: { "ngrok-skip-browser-warning": "True" },
+      signal: controller.signal,
+      cache: "no-store",
+    });
+
+    if (!response.ok) return false;
+
+    const data: unknown = await response.json();
+    return (
+      typeof data === "object" &&
+      data !== null &&
+      "status" in data &&
+      data.status === "ok"
+    );
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
 
 // Response types
 export interface ApiResponse<T = any> {

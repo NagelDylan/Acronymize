@@ -26,6 +26,17 @@ logger = logging.getLogger(__name__)
 
 BATCH_SIZE_DEFAULT = 20
 
+
+class HealthCheckView(APIView):
+    """Small unauthenticated endpoint used by the frontend at startup."""
+
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        return Response({"status": "ok"})
+
+
 def clerk_authenticated(view_func):
     """
     Decorator that verifies Clerk JWT tokens and attaches user info to the request.

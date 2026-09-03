@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LandingPage } from "./components/landing-page/LandingPage";
 import { ModeSelection } from "./components/ModeSelection";
 import { CategorySelection } from "./components/CategorySelection";
@@ -12,8 +12,14 @@ import { usePuzzleService } from "./services/puzzleService";
 import { type FrontendPuzzleElement } from "./types/components";
 import { InstructionsPage } from "./components/Instructions";
 import { ProfileModal } from "./components/ProfileModal";
+import { ServerStatusScreen } from "./components/ServerStatusScreen";
+import { checkServerHealth } from "./utils/api";
+
+type ServerStatus = "checking" | "online" | "offline";
 
 export default function App() {
+  const [serverStatus, setServerStatus] =
+    useState<ServerStatus>("checking");
   const [currentScreen, setCurrentScreen] = useState<Screen>("landing");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [selectedMode, setSelectedMode] = useState("");
@@ -28,6 +34,16 @@ export default function App() {
   );
 
   const { getPuzzle } = usePuzzleService();
+
+  const checkServer = useCallback(async () => {
+    setServerStatus("checking");
+    const isHealthy = await checkServerHealth();
+    setServerStatus(isHealthy ? "online" : "offline");
+  }, []);
+
+  useEffect(() => {
+    void checkServer();
+  }, [checkServer]);
 
   const handleAuthClick = () => {
     setShowLoginModal(true);
@@ -87,6 +103,15 @@ export default function App() {
       setCurrentScreen("game");
     }
   };
+
+  if (serverStatus !== "online") {
+    return (
+      <ServerStatusScreen
+        isChecking={serverStatus === "checking"}
+        onRetry={() => void checkServer()}
+      />
+    );
+  }
 
   return (
     <>

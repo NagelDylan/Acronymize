@@ -67,7 +67,7 @@ This directory contains the React frontend for the Acronymize word puzzle game. 
    VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_key_here
 
    # API Configuration
-   VITE_API_BASE_URL=http://localhost:8000
+   VITE_API_BASE_URL=http://localhost:8000/api
    VITE_API_TIMEOUT=10000
 
    # Development Settings
